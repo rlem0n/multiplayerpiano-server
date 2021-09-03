@@ -42,9 +42,10 @@ std::string getSocketIp(uS::Socket * s, uWS::HttpRequest req) {
 	auto addr = s->getAddress();
 	switch (addr.family[3]) {
 		case '6':
-		case '4':
-			return addr.address;
-			break;
+		case '4': {
+			uWS::Header h = req.getHeader("x-forwarded-for", 15);
+			return h ? h.toString().substr(0, h.toString().find(',')) : "";
+		} break;
 
 #ifdef UWS_UDS
 		case 'X': {
